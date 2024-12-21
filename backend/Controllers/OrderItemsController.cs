@@ -31,10 +31,20 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<OrderItemReadDto>>> GetOrderItems()
         {
-            var orderItems = await _orderItemRepo.GetAllAsync();
-            var orderItemsDto = _mapper.Map<IEnumerable<OrderItemReadDto>>(orderItems);
-            return Ok(orderItemsDto);
+            try
+            {
+                var orderItems = await _orderItemRepo.GetAllAsync();
+                var orderItemsDto = _mapper.Map<IEnumerable<OrderItemReadDto>>(orderItems);
+                return Ok(orderItemsDto);
+            }
+            catch (Exception ex)
+            {
+                // Ghi log lỗi chi tiết
+                Console.WriteLine($"Error in GetOrderItems: {ex}");
+                return StatusCode(500, $"Internal Server Error: {ex.Message}");
+            }
         }
+
 
         // GET: api/OrderItems/5
         [HttpGet("{id}")]

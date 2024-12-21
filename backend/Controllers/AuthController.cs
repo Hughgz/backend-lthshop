@@ -64,10 +64,8 @@ namespace backend.Controllers
                 return BadRequest("Registration failed.");
             }
 
-            var token = GenerateJwtToken(customer);
-            SetAuthCookie(token);
 
-            return Ok(new { Token = token });
+            return Ok(new { customer });
         }
 
         // POST: api/Authen/Logout (Logout User)

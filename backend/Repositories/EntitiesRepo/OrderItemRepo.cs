@@ -19,6 +19,15 @@ namespace backend.Repositories.EntitiesRepo
             return orderItems;
         }
 
+        public override async Task<IEnumerable<OrderItem>> GetAllAsync()
+        {
+            return await _context.OrderItems
+                .Include(o => o.ProductSize) // Tải dữ liệu từ ProductSize
+                .ThenInclude(ps => ps.Product) // Tải thêm Product từ ProductSize
+                .ToListAsync();
+        }
+
+
 
     }
 }

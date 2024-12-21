@@ -75,7 +75,7 @@ namespace backend.Repositories.AuthRepo
             await _context.SaveChangesAsync();
 
             // Send email to verify email
-            var baseUrl = "https://next-ecommerce-eight-omega.vercel.app";
+            var baseUrl = "https://lthshop-frontend.vercel.app";
             var verificationLink = $"{baseUrl}/Authen/VerifyEmail?token={customer.EmailVerificationToken}";
             var emailContent = $"Please verify your email by clicking the following link: {verificationLink}";
 
