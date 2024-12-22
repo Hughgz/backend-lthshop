@@ -11,5 +11,8 @@ namespace backend.Repositories.AuthRepo
         Task<User> ValidateUserCredentialsAsync(string email, string password);
         Task<User> GetUserByEmailAsync(string email);
         Task<Customer> GetCustomerByEmailAsync(string email);
+        Task<bool> ChangeCustomerPasswordAsync(string email, string newPassword);
+        Task<Customer> GetCustomerByVerificationTokenAsync(string token);
+
     }
 }

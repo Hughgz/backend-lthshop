@@ -14,11 +14,16 @@ namespace backend.Services
 
         public async Task SendEmailAsync(string toEmail, string subject, string body)
         {
-            var fromEmail = _configuration["EmailSettings:FromEmail"];
+            var fromEmail = _configuration["EmailSettings:SenderEmail"];
             var smtpServer = _configuration["EmailSettings:SmtpServer"];
             var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"]);
-            var smtpUser = _configuration["EmailSettings:SmtpUser"];
-            var smtpPassword = _configuration["EmailSettings:SmtpPassword"];
+            var smtpUser = _configuration["EmailSettings:SenderEmail"]; // Use SenderEmail here
+            var smtpPassword = _configuration["EmailSettings:SenderPassword"];
+
+            if (string.IsNullOrEmpty(fromEmail) || string.IsNullOrEmpty(smtpUser) || string.IsNullOrEmpty(smtpPassword))
+            {
+                throw new InvalidOperationException("Email settings are not configured correctly.");
+            }
 
             var mailMessage = new MailMessage
             {

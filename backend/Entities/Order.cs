@@ -7,7 +7,7 @@ namespace backend.Entities
     {
         Pending,
         Processing,
-        Shipped,
+        Shipping,
         Delivered,
         Cancelled,
     }
