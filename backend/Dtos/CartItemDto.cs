@@ -20,6 +20,7 @@
 
     public class CartItemUpdateDto
     {
+
         public int CartItemID { get; set; }
         public int CustomerID { get; set; }
         public int? ProductSizeID { get; set; }

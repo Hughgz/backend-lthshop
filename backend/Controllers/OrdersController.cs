@@ -189,7 +189,8 @@ namespace backend.Controllers
             if (!paymentResponse.Success)
             {
                 _logger.LogError("Payment verification failed. Response: {Response}", paymentResponse);
-                return BadRequest("Payment verification failed.");
+                var redirectUrl = $"{_config["VnPay:VnPayFrontendReturnUrl"]}?success={paymentResponse.Success}";
+                return Redirect(redirectUrl);
             }
 
             try

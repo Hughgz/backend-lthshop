@@ -80,6 +80,24 @@ namespace backend.Services
                 };
             }
 
+            if (vnpResponseCode == "24")
+            {
+                _logger.LogInformation("Giao dịch bị hủy bởi khách hàng.");
+                return new VnPaymentResponseModel
+                {
+                    Success = false,
+                };
+            }
+
+            if (vnpResponseCode != "00")
+            {
+                _logger.LogWarning($"Giao dịch không thành công. Mã lỗi: {vnpResponseCode}");
+                return new VnPaymentResponseModel
+                {
+                    Success = false,
+                };
+            }
+
             return new VnPaymentResponseModel
             {
                 Success = true,
@@ -91,5 +109,6 @@ namespace backend.Services
                 VnPayResponseCode = vnpResponseCode
             };
         }
+
     }
 }

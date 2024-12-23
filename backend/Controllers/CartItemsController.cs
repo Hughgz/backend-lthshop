@@ -51,26 +51,39 @@ namespace backend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCartItem(int id, CartItemUpdateDto cartItem)
         {
-            // Check if the cart item exists in the repository before updating
+            if (cartItem == null)
+            {
+                return BadRequest("Cart item is required.");
+            }
+
+            if (id != cartItem.CartItemID)
+            {
+                return BadRequest("Cart item ID does not match the ID in the request.");
+            }
+
+            // Check if the cart item exists by ID
             var existingCartItem = await _cartItemRepo.GetByIdAsync(id);
+
             if (existingCartItem == null)
             {
                 return NotFound("Cart item not found.");
             }
 
-            // Map the DTO to the entity
+            // Map the updates from DTO to the existing entity
             _mapper.Map(cartItem, existingCartItem);
 
-            // Assuming UpdateAsync will modify the item in the database and return the updated entity
+            // Update the cart item in the database
             var updatedCartItem = await _cartItemRepo.UpdateAsync(existingCartItem);
+
             if (updatedCartItem == null)
             {
                 return BadRequest("Failed to update the cart item.");
             }
 
-            // Return NoContent when update is successful
-            return NoContent();
+            return Ok(_mapper.Map<CartItemReadDto>(updatedCartItem));
         }
+
+
 
         // POST: api/CartItems
         [HttpPost]
@@ -81,18 +94,26 @@ namespace backend.Controllers
                 return BadRequest("Cart item is required.");
             }
 
-            // Map DTO to the entity
-            var newCartItem = _mapper.Map<CartItem>(cartItem);
+            // Check if item exists
+            var existingCartItem = await _cartItemRepo.GetCartItemByCustomerIdAndProductIdAsync(
+                cartItem.CustomerID, cartItem.ProductSizeID);
 
-            var result = await _cartItemRepo.AddAsync(newCartItem);
-            if (result == null)
+            if (existingCartItem != null)
             {
-                return BadRequest("Unable to add the cart item.");
+                // Increase quantity if item exists
+                existingCartItem.Quantity += cartItem.Quantity;
+                await _cartItemRepo.UpdateAsync(existingCartItem);
+                return NoContent();
             }
+
+            // Add new item if not exists
+            var newCartItem = _mapper.Map<CartItem>(cartItem);
+            var result = await _cartItemRepo.AddAsync(newCartItem);
 
             var cartItemDto = _mapper.Map<CartItemReadDto>(result);
             return CreatedAtAction("GetCartItem", new { id = cartItemDto.CartItemID }, cartItemDto);
         }
+
 
         // DELETE: api/CartItems/5
         [HttpDelete("{id}")]
@@ -129,21 +150,20 @@ namespace backend.Controllers
 
             foreach (var sessionItem in cartItemsFromSession)
             {
-                // Kiểm tra xem cart item có tồn tại dựa trên CartID và ProductID
-                var existingCartItem = await _cartItemRepo.GetCartItemByCustomerIdAndProductIdAsync(sessionItem.CustomerID, sessionItem.ProductSizeID);
+                // Check if the cart item exists in the database
+                var existingCartItem = await _cartItemRepo.GetCartItemByCustomerIdAndProductIdAsync(
+                    sessionItem.CustomerID, sessionItem.ProductSizeID);
 
                 if (existingCartItem == null)
                 {
-                    // Nếu cart item không tồn tại, thêm mới
+                    // If not exists, add a new item
                     var newCartItem = _mapper.Map<CartItem>(sessionItem);
                     await _cartItemRepo.AddAsync(newCartItem);
                 }
                 else
                 {
-                    // Nếu cart item đã tồn tại, cập nhật số lượng và các thuộc tính cần thiết
+                    // If exists, increase the quantity
                     existingCartItem.Quantity += sessionItem.Quantity;
-
-                    // Cập nhật trong cơ sở dữ liệu
                     await _cartItemRepo.UpdateAsync(existingCartItem);
                 }
             }
