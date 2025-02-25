@@ -12,8 +12,8 @@ using backend.Entities;
 namespace backend.Migrations
 {
     [DbContext(typeof(EcommerceDBContext))]
-    [Migration("20250224084820_InitDB")]
-    partial class InitDB
+    [Migration("20250225101010_DBInit")]
+    partial class DBInit
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -177,6 +177,9 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("PurchaseReceiptID")
+                        .HasColumnType("int");
+
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -185,6 +188,8 @@ namespace backend.Migrations
                     b.HasIndex("OrderID");
 
                     b.HasIndex("ProductSizeID");
+
+                    b.HasIndex("PurchaseReceiptID");
 
                     b.ToTable("OrderItems");
                 });
@@ -257,6 +262,70 @@ namespace backend.Migrations
                     b.ToTable("ProductSizes");
                 });
 
+            modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
+                {
+                    b.Property<int>("PurchaseReceiptID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseReceiptID"));
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PaymentType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TransactionID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("PurchaseReceiptID");
+
+                    b.HasIndex("SupplierId");
+
+                    b.ToTable("PurchaseReceipt");
+                });
+
+            modelBuilder.Entity("backend.Entities.PurchaseReceiptDetail", b =>
+                {
+                    b.Property<int>("PurchaseReceiptDetailID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseReceiptDetailID"));
+
+                    b.Property<int>("ProductSizeID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PurchaseReceiptID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<double>("Total")
+                        .HasColumnType("float");
+
+                    b.HasKey("PurchaseReceiptDetailID");
+
+                    b.HasIndex("ProductSizeID");
+
+                    b.HasIndex("PurchaseReceiptID");
+
+                    b.ToTable("PurchaseReceiptDetail");
+                });
+
             modelBuilder.Entity("backend.Entities.Revenue", b =>
                 {
                     b.Property<int>("Id")
@@ -280,6 +349,35 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Revenues");
+                });
+
+            modelBuilder.Entity("backend.Entities.Supplier", b =>
+                {
+                    b.Property<int>("SupplierID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SupplierID"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SupplierID");
+
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("backend.Entities.User", b =>
@@ -365,6 +463,10 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("backend.Entities.PurchaseReceipt", null)
+                        .WithMany("OrderItems")
+                        .HasForeignKey("PurchaseReceiptID");
+
                     b.Navigation("Order");
 
                     b.Navigation("ProductSize");
@@ -392,6 +494,36 @@ namespace backend.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
+                {
+                    b.HasOne("backend.Entities.Supplier", "Supplier")
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Supplier");
+                });
+
+            modelBuilder.Entity("backend.Entities.PurchaseReceiptDetail", b =>
+                {
+                    b.HasOne("backend.Entities.ProductSize", "ProductSize")
+                        .WithMany()
+                        .HasForeignKey("ProductSizeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Entities.PurchaseReceipt", "PurchaseReceipt")
+                        .WithMany()
+                        .HasForeignKey("PurchaseReceiptID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductSize");
+
+                    b.Navigation("PurchaseReceipt");
+                });
+
             modelBuilder.Entity("backend.Entities.Category", b =>
                 {
                     b.Navigation("Products");
@@ -415,6 +547,11 @@ namespace backend.Migrations
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
+                {
+                    b.Navigation("OrderItems");
+                });
+
+            modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
                 {
                     b.Navigation("OrderItems");
                 });

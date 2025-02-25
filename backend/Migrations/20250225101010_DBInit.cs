@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class DBInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -60,6 +60,22 @@ namespace backend.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Revenues", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Suppliers",
+                columns: table => new
+                {
+                    SupplierID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Suppliers", x => x.SupplierID);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,6 +146,30 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PurchaseReceipt",
+                columns: table => new
+                {
+                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TransactionID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SupplierId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseReceipt", x => x.PurchaseReceiptID);
+                    table.ForeignKey(
+                        name: "FK_PurchaseReceipt_Suppliers_SupplierId",
+                        column: x => x.SupplierId,
+                        principalTable: "Suppliers",
+                        principalColumn: "SupplierID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductSizes",
                 columns: table => new
                 {
@@ -185,7 +225,8 @@ namespace backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     OrderID = table.Column<int>(type: "int", nullable: false),
-                    ProductSizeID = table.Column<int>(type: "int", nullable: false)
+                    ProductSizeID = table.Column<int>(type: "int", nullable: false),
+                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -201,6 +242,39 @@ namespace backend.Migrations
                         column: x => x.ProductSizeID,
                         principalTable: "ProductSizes",
                         principalColumn: "ProductSizeID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderItems_PurchaseReceipt_PurchaseReceiptID",
+                        column: x => x.PurchaseReceiptID,
+                        principalTable: "PurchaseReceipt",
+                        principalColumn: "PurchaseReceiptID");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PurchaseReceiptDetail",
+                columns: table => new
+                {
+                    PurchaseReceiptDetailID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false),
+                    ProductSizeID = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    Total = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PurchaseReceiptDetail", x => x.PurchaseReceiptDetailID);
+                    table.ForeignKey(
+                        name: "FK_PurchaseReceiptDetail_ProductSizes_ProductSizeID",
+                        column: x => x.ProductSizeID,
+                        principalTable: "ProductSizes",
+                        principalColumn: "ProductSizeID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_PurchaseReceiptDetail_PurchaseReceipt_PurchaseReceiptID",
+                        column: x => x.PurchaseReceiptID,
+                        principalTable: "PurchaseReceipt",
+                        principalColumn: "PurchaseReceiptID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -225,6 +299,11 @@ namespace backend.Migrations
                 column: "ProductSizeID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderItems_PurchaseReceiptID",
+                table: "OrderItems",
+                column: "PurchaseReceiptID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerID",
                 table: "Orders",
                 column: "CustomerID");
@@ -238,6 +317,21 @@ namespace backend.Migrations
                 name: "IX_ProductSizes_ProductID",
                 table: "ProductSizes",
                 column: "ProductID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseReceipt_SupplierId",
+                table: "PurchaseReceipt",
+                column: "SupplierId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseReceiptDetail_ProductSizeID",
+                table: "PurchaseReceiptDetail",
+                column: "ProductSizeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PurchaseReceiptDetail_PurchaseReceiptID",
+                table: "PurchaseReceiptDetail",
+                column: "PurchaseReceiptID");
         }
 
         /// <inheritdoc />
@@ -248,6 +342,9 @@ namespace backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseReceiptDetail");
 
             migrationBuilder.DropTable(
                 name: "Revenues");
@@ -262,10 +359,16 @@ namespace backend.Migrations
                 name: "ProductSizes");
 
             migrationBuilder.DropTable(
+                name: "PurchaseReceipt");
+
+            migrationBuilder.DropTable(
                 name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Suppliers");
 
             migrationBuilder.DropTable(
                 name: "Categories");

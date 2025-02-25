@@ -21,5 +21,8 @@ namespace backend.Entities
         public DbSet<User> Users { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<Revenue> Revenues { get; set; }
+        public DbSet<PurchaseReceipt> PurchaseReceipt { get; set; }
+        public DbSet<PurchaseReceiptDetail> PurchaseReceiptDetail { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
     }
 }

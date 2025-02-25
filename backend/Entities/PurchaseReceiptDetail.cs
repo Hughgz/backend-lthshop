@@ -7,9 +7,7 @@ namespace backend.Entities
     {
         [Key]
         public int PurchaseReceiptDetailID { get; set; }
-        [Required]
-        public int Quantity { get; set; }
-
+        
         [Required]
         public int PurchaseReceiptID { get; set; }
         [JsonIgnore]
@@ -19,5 +17,10 @@ namespace backend.Entities
         public int ProductSizeID { get; set; }
         [JsonIgnore]
         public ProductSize ProductSize { get; set; }
+
+        [Required]
+        public int Quantity { get; set; }
+
+        public double Total { get; set; }
     }
 }
