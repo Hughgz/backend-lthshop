@@ -71,6 +71,7 @@ builder.Services.AddScoped<CartItemRepo>();
 builder.Services.AddScoped<OrderRepo>();
 builder.Services.AddScoped<OrderItemRepo>();
 builder.Services.AddScoped<RevenueRepo>();
+builder.Services.AddScoped<PurchaseReceiptRepo>();
 
 // Register services
 builder.Services.AddScoped<VNPayService>();
