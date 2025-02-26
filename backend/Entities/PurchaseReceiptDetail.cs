@@ -7,20 +7,24 @@ namespace backend.Entities
     {
         [Key]
         public int PurchaseReceiptDetailID { get; set; }
-        
-        [Required]
+
         public int PurchaseReceiptID { get; set; }
+
+        public int ProductSizeID { get; set; }
+
+        public string Unit { get; set; }
+
+        public int Quantity { get; set; }
+
+        public int? RealQuantity { get; set; }
+
+        public decimal RawPrice { get; set; }
+
+        // Navigation properties
         [JsonIgnore]
         public PurchaseReceipt PurchaseReceipt { get; set; }
 
-        [Required]
-        public int ProductSizeID { get; set; }
         [JsonIgnore]
         public ProductSize ProductSize { get; set; }
-
-        [Required]
-        public int Quantity { get; set; }
-
-        public double Total { get; set; }
     }
 }

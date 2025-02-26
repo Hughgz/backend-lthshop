@@ -18,25 +18,21 @@ namespace backend.Entities
         [Key]
         public int PurchaseReceiptID { get; set; }
 
-        [Required]
         public DateTime DateTime { get; set; }
 
-        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
 
-        [Required]
         public PurchaseReceiptStatus Status { get; set; }
         public string PaymentType { get; set; }
 
-        [Required]
-        public string TransactionID { get; set; }
+        public string? TransactionID { get; set; }
 
-        [Required]
         public int SupplierId { get; set; }
-        public Supplier Supplier { get; set; }
 
         // Navigation property
+        public Supplier Supplier { get; set; }
+
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
