@@ -13,6 +13,8 @@ namespace backend.Entities
 
         public int StockQuantity { get; set; }
 
+        public int RealQuantity {  get; set; }
+
         public int ProductID { get; set; }
 
         // Navigation property

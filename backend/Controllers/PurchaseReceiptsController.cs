@@ -13,12 +13,14 @@ namespace backend.Controllers
     {
         private readonly PurchaseReceiptRepo _purchaseReceiptRepo;
         private readonly PurchaseReceiptDetailRepo _purchaseReceiptDetailRepo;
+        private readonly ProductSizeRepo _productSizeRepo;
         private readonly IMapper _mapper;
 
-        public PurchaseReceiptsController(PurchaseReceiptRepo purchaseReceiptRepo, PurchaseReceiptDetailRepo purchaseReceiptDetailRepo, IMapper mapper)
+        public PurchaseReceiptsController(PurchaseReceiptRepo purchaseReceiptRepo, PurchaseReceiptDetailRepo purchaseReceiptDetailRepo, ProductSizeRepo productSizeRepo, IMapper mapper)
         {
             _purchaseReceiptRepo = purchaseReceiptRepo;
-            _purchaseReceiptDetailRepo = purchaseReceiptDetailRepo; 
+            _purchaseReceiptDetailRepo = purchaseReceiptDetailRepo;
+            _productSizeRepo = productSizeRepo;
             _mapper = mapper;
         }
 
@@ -39,22 +41,34 @@ namespace backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetPurchaseReceiptById(int id)
         {
-            var purchaseReceipt = await _purchaseReceiptRepo.GetByIdAsync(id);
+            var purchaseReceiptResult = await _purchaseReceiptRepo.GetByIdAsync(id);
+            var purchaseReceipt = _mapper.Map<PurchaseReceiptReadDto>(purchaseReceiptResult);
             if (purchaseReceipt == null)
                 return NotFound();
-            return Ok(_mapper.Map<PurchaseReceipt>(purchaseReceipt));
+            var purchaseReceiptDetails = _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(purchaseReceipt.PurchaseReceiptID);
+            var purchaseReceiptDetailsDto = _mapper.Map<IEnumerable<PurchaseReceiptDetailReadDto>>(purchaseReceiptDetails);
+            purchaseReceipt.Details = purchaseReceiptDetailsDto;
+            return Ok(purchaseReceipt);
         }
 
         [HttpGet("by-filter")]
         public async Task<IActionResult> GetPurchaseReceiptsByFilter([FromQuery] DateTime? date, [FromQuery] decimal? minTotalPrice, [FromQuery] decimal? maxTotalPrice, [FromQuery] PurchaseReceiptStatus? status)
         {
-            var purchaseReceipts = await _purchaseReceiptRepo.GetManyByFilter(pr =>
+            var purchaseReceiptsResults = await _purchaseReceiptRepo.GetManyByFilter(pr =>
                 (!date.HasValue || pr.DateTime.Date == date.Value.Date) &&
                 (!minTotalPrice.HasValue || pr.TotalPrice >= minTotalPrice.Value) &&
                 (!maxTotalPrice.HasValue || pr.TotalPrice <= maxTotalPrice.Value) &&
                 (!status.HasValue || pr.Status == status.Value)
             );
-            return Ok(_mapper.Map<IEnumerable<PurchaseReceipt>>(purchaseReceipts));
+
+            var purchaseReceipts = _mapper.Map<IEnumerable<PurchaseReceiptReadDto>>(purchaseReceiptsResults);
+            foreach (var purchaseReceipt in purchaseReceipts)
+            {
+                var purchaseReceiptDetails = _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(purchaseReceipt.PurchaseReceiptID);
+                var purchaseReceiptDetailsDto = _mapper.Map<IEnumerable<PurchaseReceiptDetailReadDto>>(purchaseReceiptDetails);
+                purchaseReceipt.Details = purchaseReceiptDetailsDto;
+            }
+            return Ok(purchaseReceipts);
         }
 
         [HttpPost]
@@ -64,13 +78,17 @@ namespace backend.Controllers
                 return BadRequest();
 
             var createPurchaseReceipt = _mapper.Map<PurchaseReceipt>(purchaseReceiptCreateDto);
-
+            var createPurchaseReceiptDetails = _mapper.Map<IEnumerable<PurchaseReceiptDetail>>(purchaseReceiptCreateDto.Details);
             var createdReceipt = await _purchaseReceiptRepo.AddAsync(createPurchaseReceipt);
+            foreach (var item in createPurchaseReceiptDetails)
+            {
+                await _purchaseReceiptDetailRepo.AddAsync(item);
+            }
             return CreatedAtAction(nameof(GetPurchaseReceiptById), new { id = createdReceipt.PurchaseReceiptID }, createdReceipt);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePurchaseReceipt(int id, [FromBody] PurchaseReceipt purchaseReceipt)
+        public async Task<IActionResult> UpdatePurchaseReceipt(int id, [FromBody] PurchaseReceiptReadDto purchaseReceipt)
         {
             if (purchaseReceipt == null || id != purchaseReceipt.PurchaseReceiptID)
                 return BadRequest();
@@ -79,10 +97,36 @@ namespace backend.Controllers
             if (existingReceipt == null)
                 return NotFound();
 
-            await _purchaseReceiptRepo.UpdateAsync(purchaseReceipt);
+            var purchaseReceiptEntity = _mapper.Map<PurchaseReceipt>(purchaseReceipt);
+            await _purchaseReceiptRepo.UpdateAsync(purchaseReceiptEntity);
+            
             return NoContent();
         }
 
+        [HttpPost("comfirm/{id}")]
+        public async Task<IActionResult> ConfirmPurchaseReceipt(int id)
+        {
+            var purchaseReceipt = await _purchaseReceiptRepo.GetByIdAsync(id);
+            if (purchaseReceipt == null)
+                return NotFound();
 
+            // Update purchase receipt status
+            purchaseReceipt.Status = PurchaseReceiptStatus.Confirmed;
+            await _purchaseReceiptRepo.UpdateAsync(purchaseReceipt);
+
+            var purchaseReceiptDetails = await _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(id);
+
+            // Update stock quantity
+            foreach (var detail in purchaseReceiptDetails)
+            {
+                var productSize = await _productSizeRepo.GetByIdAsync(detail.ProductSizeID);
+                productSize.StockQuantity += detail.RealQuantity.Value;
+                productSize.RealQuantity += detail.RealQuantity.Value;
+
+                await _productSizeRepo.UpdateAsync(productSize);
+            }
+
+            return NoContent();
+        }
     }
 }

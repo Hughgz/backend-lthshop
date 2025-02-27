@@ -2,7 +2,7 @@
 
 namespace backend.Entities
 {
-    public class GoodsInspectionItems
+    public class GoodsInspectionItem
     {
         [Key]
         public int Id { get; set; }

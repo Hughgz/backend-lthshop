@@ -47,6 +47,21 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GoodsInspectionItems",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GoodsInspectionId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    RealQuantity = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GoodsInspectionItems", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Revenues",
                 columns: table => new
                 {
@@ -85,7 +100,6 @@ namespace backend.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HashPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
@@ -155,7 +169,7 @@ namespace backend.Migrations
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     PaymentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TransactionID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TransactionID = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SupplierId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -170,14 +184,43 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "GoodsInspections",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedById = table.Column<int>(type: "int", nullable: false),
+                    InchargePersonId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GoodsInspections", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_GoodsInspections_Users_CreatedById",
+                        column: x => x.CreatedById,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_GoodsInspections_Users_InchargePersonId",
+                        column: x => x.InchargePersonId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductSizes",
                 columns: table => new
                 {
                     ProductSizeID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Size = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
+                    StockQuantity = table.Column<int>(type: "int", nullable: false),
+                    RealQuantity = table.Column<int>(type: "int", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -188,6 +231,54 @@ namespace backend.Migrations
                         column: x => x.ProductID,
                         principalTable: "Products",
                         principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockHistories",
+                columns: table => new
+                {
+                    StockHistoryID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProductID = table.Column<int>(type: "int", nullable: false),
+                    StockChange = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockHistories", x => x.StockHistoryID);
+                    table.ForeignKey(
+                        name: "FK_StockHistories_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ProductID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DeliveryOrders",
+                columns: table => new
+                {
+                    DeliveryOrderID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DeliverySupplier = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveredAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ReceivedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    DeliveryNote = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeliveryOrders", x => x.DeliveryOrderID);
+                    table.ForeignKey(
+                        name: "FK_DeliveryOrders_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -251,6 +342,31 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductPrice",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ProductSizeId = table.Column<int>(type: "int", nullable: false),
+                    SellingPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    productPriceStatus = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductPrice", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProductPrice_ProductSizes_ProductSizeId",
+                        column: x => x.ProductSizeId,
+                        principalTable: "ProductSizes",
+                        principalColumn: "ProductSizeID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PurchaseReceiptDetail",
                 columns: table => new
                 {
@@ -258,8 +374,10 @@ namespace backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     PurchaseReceiptID = table.Column<int>(type: "int", nullable: false),
                     ProductSizeID = table.Column<int>(type: "int", nullable: false),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Total = table.Column<double>(type: "float", nullable: false)
+                    RealQuantity = table.Column<int>(type: "int", nullable: true),
+                    RawPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -289,6 +407,21 @@ namespace backend.Migrations
                 column: "ProductSizeID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_DeliveryOrders_OrderId",
+                table: "DeliveryOrders",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GoodsInspections_CreatedById",
+                table: "GoodsInspections",
+                column: "CreatedById");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_GoodsInspections_InchargePersonId",
+                table: "GoodsInspections",
+                column: "InchargePersonId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_OrderID",
                 table: "OrderItems",
                 column: "OrderID");
@@ -307,6 +440,11 @@ namespace backend.Migrations
                 name: "IX_Orders_CustomerID",
                 table: "Orders",
                 column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductPrice_ProductSizeId",
+                table: "ProductPrice",
+                column: "ProductSizeId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CategoryID",
@@ -332,6 +470,11 @@ namespace backend.Migrations
                 name: "IX_PurchaseReceiptDetail_PurchaseReceiptID",
                 table: "PurchaseReceiptDetail",
                 column: "PurchaseReceiptID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_StockHistories_ProductID",
+                table: "StockHistories",
+                column: "ProductID");
         }
 
         /// <inheritdoc />
@@ -341,13 +484,28 @@ namespace backend.Migrations
                 name: "CartItems");
 
             migrationBuilder.DropTable(
+                name: "DeliveryOrders");
+
+            migrationBuilder.DropTable(
+                name: "GoodsInspectionItems");
+
+            migrationBuilder.DropTable(
+                name: "GoodsInspections");
+
+            migrationBuilder.DropTable(
                 name: "OrderItems");
+
+            migrationBuilder.DropTable(
+                name: "ProductPrice");
 
             migrationBuilder.DropTable(
                 name: "PurchaseReceiptDetail");
 
             migrationBuilder.DropTable(
                 name: "Revenues");
+
+            migrationBuilder.DropTable(
+                name: "StockHistories");
 
             migrationBuilder.DropTable(
                 name: "Users");

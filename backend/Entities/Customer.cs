@@ -45,12 +45,5 @@ namespace backend.Entities
 
         public List<CartItem> CartItems { get; set; } = new List<CartItem>();
 
-        public decimal TotalAmount
-        {
-            get
-            {
-                return CartItems.Sum(item => item.Quantity * item.ProductSize.Price);
-            }
-        }
     }
 }
