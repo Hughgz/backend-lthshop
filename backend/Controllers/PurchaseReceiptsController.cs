@@ -104,7 +104,7 @@ namespace backend.Controllers
         }
 
         [HttpPost("comfirm/{id}")]
-        public async Task<IActionResult> ConfirmPurchaseReceipt(int id)
+        public async Task<IActionResult> ConfirmPurchaseReceipt(int id, IEnumerable<PurchaseReceiptDetailUpdateDto> purchaseReceiptDetailUpdateDtos)
         {
             var purchaseReceipt = await _purchaseReceiptRepo.GetByIdAsync(id);
             if (purchaseReceipt == null)
@@ -114,11 +114,16 @@ namespace backend.Controllers
             purchaseReceipt.Status = PurchaseReceiptStatus.Confirmed;
             await _purchaseReceiptRepo.UpdateAsync(purchaseReceipt);
 
-            var purchaseReceiptDetails = await _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(id);
-
             // Update stock quantity
-            foreach (var detail in purchaseReceiptDetails)
+            foreach (var detail in purchaseReceiptDetailUpdateDtos)
             {
+                // Update real quantity to purchase receipt detail
+                var purchaseReceiptDetail = await _purchaseReceiptDetailRepo.GetByIdAsync(detail.PurchaseReceiptDetailID);
+                purchaseReceiptDetail.RealQuantity = detail.RealQuantity.Value;
+                
+                await _purchaseReceiptDetailRepo.UpdateAsync(purchaseReceiptDetail);
+
+                // Update stock quantity to product size
                 var productSize = await _productSizeRepo.GetByIdAsync(detail.ProductSizeID);
                 productSize.StockQuantity += detail.RealQuantity.Value;
                 productSize.RealQuantity += detail.RealQuantity.Value;
