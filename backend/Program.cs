@@ -66,7 +66,6 @@ builder.Services.AddScoped<IRepo<CartItem>, CartItemRepo>();
 builder.Services.AddScoped<CartItemRepo>();
 builder.Services.AddScoped<OrderRepo>();
 builder.Services.AddScoped<OrderItemRepo>();
-
 // Register services
 builder.Services.AddScoped<VNPayService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
