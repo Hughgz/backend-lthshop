@@ -3,29 +3,36 @@ using System.ComponentModel.DataAnnotations;
 
 namespace backend.Entities
 {
-    public enum OrderStatus
+    public enum PurchaseReceiptStatus
     {
-        Pending,
-        Processing,
-        Shipping,
-        Delivered,
-        Cancelled,
+        Pending = 1,
+        Processing = 2,
+        Shipping = 3,
+        Delivered = 4,
+        Confirmed = 5,
+        Cancelled = 6,
     }
 
-    public class Order
+    public class PurchaseReceipt
     {
         [Key]
-        public int OrderID { get; set; }
+        public int PurchaseReceiptID { get; set; }
+
         public DateTime DateTime { get; set; }
+
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
-        public OrderStatus Status { get; set; }
+
+        public PurchaseReceiptStatus Status { get; set; }
         public string PaymentType { get; set; }
-        public string TransactionID { get; set; }
-        public int CustomerID { get; set; }
+
+        public string? TransactionID { get; set; }
+
+        public int SupplierId { get; set; }
 
         // Navigation property
-        public Customer Customer { get; set; }
+        public Supplier Supplier { get; set; }
+
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

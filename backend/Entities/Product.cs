@@ -23,11 +23,8 @@ namespace backend.Entities
 
         public string NameAlias { get; set; }
 
-        // Foreign key and relationship
-        [Required]
         public int CategoryID { get; set; }
 
-        [ForeignKey("CategoryID")]
         public Category Category { get; set; }
 
         // Navigation property

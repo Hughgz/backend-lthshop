@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 
 namespace backend.Entities
 {
@@ -13,8 +13,6 @@ namespace backend.Entities
         public string Username { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
-        [Required]
         [EmailAddress]
         public string Email { get; set; }
 
@@ -27,5 +25,8 @@ namespace backend.Entities
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
+
+        public ICollection<GoodsInspection> GoodsInspections { get; set; } = new List<GoodsInspection>();
     }
 }
+

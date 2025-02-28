@@ -11,7 +11,6 @@ namespace backend.Profiles
             // Mapping for CartItem -> CartItemReadDto
             CreateMap<CartItem, CartItemReadDto>()
                 .ForMember(dest => dest.Product, opt => opt.MapFrom(src => src.ProductSize.Product))
-                .ForMember(dest => dest.ProductPrice, opt => opt.MapFrom(src => src.ProductSize.Price))
                 .ForMember(dest => dest.ProductSizeName, opt => opt.MapFrom(src => src.ProductSize.Size));
 
             // Mapping for CartItemCreateDto -> CartItem
