@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Repositories.EntitiesRepo
 {
-    public class RevenueRepo : GenericRepo<Product>
+    public class RevenueRepo : GenericRepo<Revenue>
     {
         public RevenueRepo(EcommerceDBContext context) : base(context)
         {
@@ -12,8 +12,7 @@ namespace backend.Repositories.EntitiesRepo
         public async Task<List<Revenue>> GetRevenueWithPeriod(DateOnly fromDate, DateOnly toDate)
         {
             return await _context.Revenues
-                .Where(r => new DateOnly(r.Year, r.Month, r.Day) >= fromDate &&
-                            new DateOnly(r.Year, r.Month, r.Day) <= toDate)
+                .Where(r => r.Date >= fromDate && r.Date <= toDate)
                 .ToListAsync();
         }
 
