@@ -8,6 +8,7 @@ namespace backend.Repositories.AuthRepo
     {
         Task<CustomerReadDto> ValidateCustomerCredentialsAsync(string email, string password);
         Task<Customer> RegisterCustomerAsync(CustomerSignUpVM customerSignUpVM);
+        Task<User> RegisterUserAsync(UserRegisterSignUpVM userRegisterSignUpVM);
         Task<User> ValidateUserCredentialsAsync(string email, string password);
         Task<User> GetUserByEmailAsync(string email);
         Task<Customer> GetCustomerByEmailAsync(string email);
