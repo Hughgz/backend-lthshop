@@ -17,7 +17,7 @@ namespace backend.Controllers
             public SpeedSMSController()
             {
                 // Initialize SpeedSMSAPI with your token
-                string accessToken = "rnM1l_pkHyoKbgIIkLUqJItOAQwtG7T_"; // Replace with your actual API token
+                string accessToken = "VDPpEyNbDHd0idoSR3SRzkA7hOgSHDM_"; // Replace with your actual API token
                 _speedSMS = new SpeedSMSService(accessToken);
             }
 
@@ -32,11 +32,11 @@ namespace backend.Controllers
                     }
 
                     string otp = OtpHelper.GenerateOtp();
-                    string sender = "54eb95390d21757c";
+                    string sender = "ecd9ab9de2644d18";
 
                     var response = _speedSMS.sendSMS(
                         request.Phones,
-                        $"OTP Code LTH Store: {otp}",
+                        $"OTP code LTH Store: {otp}",
                         2,
                         sender
                     );

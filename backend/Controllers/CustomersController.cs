@@ -8,6 +8,11 @@ using backend.Entities;
 using backend.Repositories.EntitiesRepo;
 using backend.Dtos;
 using AutoMapper;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
+using System.Globalization;
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Text;
 
 namespace backend.Controllers
 {
@@ -98,6 +103,37 @@ namespace backend.Controllers
             }
 
             return NoContent();
+        }
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportCustomersToCsv()
+        {
+            // Lấy danh sách khách hàng từ database
+            var customers = await _customerRepo.GetAllAsync();
+
+            // Chuyển đổi khách hàng thành CustomerReadDto
+            var customerDtos = _mapper.Map<IEnumerable<CustomerReadDto>>(customers);
+
+            // Tạo bộ ghi dữ liệu CSV
+            var csvConfig = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+            };
+
+            // Dùng StringWriter và CsvWriter để tạo file CSV
+            using (var stringWriter = new StringWriter())
+            using (var csvWriter = new CsvHelper.CsvWriter(stringWriter, csvConfig))
+            {
+                // Ghi tiêu đề cho CSV
+                await csvWriter.WriteRecordsAsync(customerDtos);
+
+                // Lấy nội dung CSV dưới dạng chuỗi
+                var csvContent = stringWriter.ToString();
+
+                // Trả về file CSV cho client
+                var fileName = "customers.csv";
+                var contentBytes = Encoding.UTF8.GetBytes(csvContent);
+                return File(contentBytes, "text/csv", fileName);
+            }
         }
     }
 }

@@ -175,5 +175,30 @@ namespace backend.Repositories.AuthRepo
             return true;
         }
 
+        public async Task<User> RegisterUserAsync(UserRegisterSignUpVM userRegisterSignUpVM)
+        {
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(c => c.Email == userRegisterSignUpVM.Email);
+
+            if (existingUser != null)
+            {
+                return null; // Customer already exists
+            }
+
+            // Create a new customer and hash the password
+            var user = new User
+            {
+                Username = userRegisterSignUpVM.Username,
+                Email = userRegisterSignUpVM.Email,
+                HashPassword = _passwordHasherCustomer.HashPassword(null, userRegisterSignUpVM.Password),
+                PasswordHash = _passwordHasherCustomer.HashPassword(null, userRegisterSignUpVM.Password),
+                Role = userRegisterSignUpVM.Role,
+            };
+
+            var newUser = _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            return newUser.Entity;
+        }
     }
 }

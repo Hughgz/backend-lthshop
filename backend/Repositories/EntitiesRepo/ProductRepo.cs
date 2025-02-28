@@ -7,6 +7,7 @@ namespace backend.Repositories.EntitiesRepo
     {
         public ProductRepo(EcommerceDBContext context) : base(context)
         {
+
         }
 
         public override async Task<IEnumerable<Product>> GetAllAsync()
@@ -16,5 +17,6 @@ namespace backend.Repositories.EntitiesRepo
                     .Include(p => p.Category)
                     .ToListAsync();
         }
+
     }
 }

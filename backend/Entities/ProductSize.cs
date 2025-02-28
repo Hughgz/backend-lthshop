@@ -19,6 +19,9 @@ namespace backend.Entities
         [Required]
         public int Quantity { get; set; }
 
+        [Required]
+        [Column(TypeName = "decimal(10,2)")]
+        public decimal CostPrice { get; set; }
         // Foreign key and relationship
         [Required]
         public int ProductID { get; set; }

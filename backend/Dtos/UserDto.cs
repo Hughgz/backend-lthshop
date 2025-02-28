@@ -19,7 +19,7 @@ namespace backend.Dtos
         public string Username { get; set; }
 
         [Required]
-        public string PasswordHash { get; set; }
+        public string HashPassword { get; set; }
 
         [Required]
         [EmailAddress]
@@ -36,7 +36,7 @@ namespace backend.Dtos
         [MaxLength(50)]
         public string Username { get; set; }
 
-        public string PasswordHash { get; set; }
+        public string HashPassword { get; set; }
 
         [Required]
         [EmailAddress]

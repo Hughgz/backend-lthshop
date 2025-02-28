@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System.ComponentModel.DataAnnotations;
 
 namespace backend.Entities
 {
@@ -13,7 +14,6 @@ namespace backend.Entities
 
         [Required]
         public string PasswordHash { get; set; }
-
         [Required]
         [EmailAddress]
         public string Email { get; set; }

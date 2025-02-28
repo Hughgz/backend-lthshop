@@ -47,7 +47,7 @@ namespace backend.Controllers
             var token = GenerateJwtToken(user);
             SetAuthCookie(token);
 
-            return Ok(new { Token = token, Id = user.Id });
+            return Ok(new { Token = token, User = user });
         }
 
         [HttpPost("login-customer")]
@@ -78,6 +78,19 @@ namespace backend.Controllers
 
             return Ok(new { customer });
         }
+        [HttpPost("registerUser")]
+        public async Task<ActionResult> RegisterUser([FromBody] UserRegisterSignUpVM registerRequest)
+        {
+            var user = await _authenRepo.RegisterUserAsync(registerRequest);
+            if (user == null)
+            {
+                return BadRequest("Registration failed.");
+            }
+
+
+            return Ok(new { user });
+        }
+
 
         // POST: api/Authen/Logout (Logout User)
         [HttpPost("logout")]
