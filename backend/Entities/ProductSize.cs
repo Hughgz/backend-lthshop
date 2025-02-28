@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
@@ -12,13 +12,10 @@ namespace backend.Entities
         public int Size { get; set; }
 
         /// <summary>
-        /// Số lượng tại kho
+        /// S? l??ng t?i kho
         /// </summary>
         public int StockQuantity { get; set; }
 
-        /// <summary>
-        /// Số lượng thực tế
-        /// </summary>
         public int RealQuantity { get; set; }
 
         public int ProductID { get; set; }
@@ -29,3 +26,4 @@ namespace backend.Entities
         public Product Product { get; set; }
     }
 }
+
