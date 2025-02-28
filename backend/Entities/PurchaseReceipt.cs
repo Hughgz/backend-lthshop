@@ -24,7 +24,7 @@ namespace backend.Entities
         public decimal TotalPrice { get; set; }
 
         public PurchaseReceiptStatus Status { get; set; }
-        public string PaymentType { get; set; }
+        public string PaymentType { get; set; } 
 
         public string? TransactionID { get; set; }
 
