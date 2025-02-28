@@ -39,9 +39,9 @@ namespace backend.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPurchaseReceiptById(int id)
+        public async Task<IActionResult> GetPurchaseReceiptById(Guid id)
         {
-            var purchaseReceiptResult = await _purchaseReceiptRepo.GetByIdAsync(id);
+            var purchaseReceiptResult = await _purchaseReceiptRepo.GetPurchaseReceiptById(id);
             var purchaseReceipt = _mapper.Map<PurchaseReceiptReadDto>(purchaseReceiptResult);
             if (purchaseReceipt == null)
                 return NotFound();
@@ -79,6 +79,16 @@ namespace backend.Controllers
 
             var createPurchaseReceipt = _mapper.Map<PurchaseReceipt>(purchaseReceiptCreateDto);
             var createPurchaseReceiptDetails = _mapper.Map<IEnumerable<PurchaseReceiptDetail>>(purchaseReceiptCreateDto.Details);
+            
+            // Gắn id vào purchase receipt và purchase receipt details
+            var newId = Guid.NewGuid();
+            createPurchaseReceipt.PurchaseReceiptID = newId;
+            foreach (var item in createPurchaseReceiptDetails)
+            {
+                item.PurchaseReceiptID = newId;
+            }
+
+            // Tạo
             var createdReceipt = await _purchaseReceiptRepo.AddAsync(createPurchaseReceipt);
             foreach (var item in createPurchaseReceiptDetails)
             {
@@ -88,12 +98,12 @@ namespace backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePurchaseReceipt(int id, [FromBody] PurchaseReceiptReadDto purchaseReceipt)
+        public async Task<IActionResult> UpdatePurchaseReceipt(Guid id, [FromBody] PurchaseReceiptReadDto purchaseReceipt)
         {
             if (purchaseReceipt == null || id != purchaseReceipt.PurchaseReceiptID)
                 return BadRequest();
 
-            var existingReceipt = await _purchaseReceiptRepo.GetByIdAsync(id);
+            var existingReceipt = await _purchaseReceiptRepo.GetPurchaseReceiptById(id);
             if (existingReceipt == null)
                 return NotFound();
 
@@ -104,9 +114,9 @@ namespace backend.Controllers
         }
 
         [HttpPost("comfirm/{id}")]
-        public async Task<IActionResult> ConfirmPurchaseReceipt(int id, IEnumerable<PurchaseReceiptDetailUpdateDto> purchaseReceiptDetailUpdateDtos)
+        public async Task<IActionResult> ConfirmPurchaseReceipt(Guid id, IEnumerable<PurchaseReceiptDetailUpdateDto> purchaseReceiptDetailUpdateDtos)
         {
-            var purchaseReceipt = await _purchaseReceiptRepo.GetByIdAsync(id);
+            var purchaseReceipt = await _purchaseReceiptRepo.GetPurchaseReceiptById(id);
             if (purchaseReceipt == null)
                 return NotFound();
 

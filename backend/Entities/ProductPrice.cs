@@ -18,7 +18,7 @@ namespace backend.Entities
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public int ProductSizeId { get; set; }
-        public decimal SellingPrice { get; set; }
+        public double SellingPrice { get; set; }
         public ProductPriceStatus productPriceStatus { get; set; }
         public string? Description { get; set; }
         public ProductSize ProductSize { get; set; }

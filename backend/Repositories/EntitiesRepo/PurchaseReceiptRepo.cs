@@ -6,6 +6,11 @@ namespace backend.Repositories.EntitiesRepo
     {
         public PurchaseReceiptRepo(EcommerceDBContext context) : base(context) { }
 
+        public async Task<PurchaseReceipt> GetPurchaseReceiptById(Guid id)
+        {
+            return await Task.FromResult(_context.Set<PurchaseReceipt>().Find(id));
+        }
+
         public async Task<PurchaseReceipt> GetOneByFilter(Func<PurchaseReceipt, bool> predicate)
         {
             return await Task.FromResult(_context.Set<PurchaseReceipt>().FirstOrDefault(predicate));

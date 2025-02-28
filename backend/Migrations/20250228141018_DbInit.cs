@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class DBInit : Migration
+    public partial class DbInit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -67,9 +67,7 @@ namespace backend.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Year = table.Column<int>(type: "int", nullable: false),
-                    Month = table.Column<int>(type: "int", nullable: false),
-                    Day = table.Column<int>(type: "int", nullable: false),
+                    Date = table.Column<DateOnly>(type: "date", nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -163,8 +161,7 @@ namespace backend.Migrations
                 name: "PurchaseReceipt",
                 columns: table => new
                 {
-                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PurchaseReceiptID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -316,8 +313,7 @@ namespace backend.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     OrderID = table.Column<int>(type: "int", nullable: false),
-                    ProductSizeID = table.Column<int>(type: "int", nullable: false),
-                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: true)
+                    ProductSizeID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -334,11 +330,6 @@ namespace backend.Migrations
                         principalTable: "ProductSizes",
                         principalColumn: "ProductSizeID",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderItems_PurchaseReceipt_PurchaseReceiptID",
-                        column: x => x.PurchaseReceiptID,
-                        principalTable: "PurchaseReceipt",
-                        principalColumn: "PurchaseReceiptID");
                 });
 
             migrationBuilder.CreateTable(
@@ -351,7 +342,7 @@ namespace backend.Migrations
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ProductSizeId = table.Column<int>(type: "int", nullable: false),
-                    SellingPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    SellingPrice = table.Column<double>(type: "float", nullable: false),
                     productPriceStatus = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -372,12 +363,12 @@ namespace backend.Migrations
                 {
                     PurchaseReceiptDetailID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false),
+                    PurchaseReceiptID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProductSizeID = table.Column<int>(type: "int", nullable: false),
                     Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     RealQuantity = table.Column<int>(type: "int", nullable: true),
-                    RawPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    RawPrice = table.Column<double>(type: "float", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -430,11 +421,6 @@ namespace backend.Migrations
                 name: "IX_OrderItems_ProductSizeID",
                 table: "OrderItems",
                 column: "ProductSizeID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderItems_PurchaseReceiptID",
-                table: "OrderItems",
-                column: "PurchaseReceiptID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_CustomerID",

@@ -8,7 +8,7 @@ namespace backend.Entities
         [Key]
         public int PurchaseReceiptDetailID { get; set; }
 
-        public int PurchaseReceiptID { get; set; }
+        public Guid PurchaseReceiptID { get; set; }
 
         public int ProductSizeID { get; set; }
 
@@ -18,7 +18,7 @@ namespace backend.Entities
 
         public int? RealQuantity { get; set; }
 
-        public decimal RawPrice { get; set; }
+        public double RawPrice { get; set; }
 
         // Navigation properties
         [JsonIgnore]
