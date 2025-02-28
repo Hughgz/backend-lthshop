@@ -29,3 +29,4 @@ namespace backend.Entities
         public ICollection<GoodsInspection> GoodsInspections { get; set; } = new List<GoodsInspection>();
     }
 }
+

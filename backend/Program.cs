@@ -21,7 +21,7 @@ builder.Services.AddCors(options =>
            .AllowAnyHeader());
 
 });
-
+builder.Services.AddHttpClient();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<TwilioService>();
 builder.Services.AddControllers();
