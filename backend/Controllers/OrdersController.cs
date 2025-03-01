@@ -23,8 +23,9 @@ namespace backend.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly OrderRepo _orderRepoSingle;
+        private readonly RevenueRepo _revenueRepo;
 
-        public OrdersController(IRepo<Order> orderRepo, IRepo<OrderItem> orderItemRepo, CartItemRepo cartItemRepo, ILogger<OrdersController> logger, VNPayService vNPayService, IDistributedCache distributedCache, IConfiguration config, IMapper mapper, OrderRepo orderRepoSingle)
+        public OrdersController(IRepo<Order> orderRepo, IRepo<OrderItem> orderItemRepo, CartItemRepo cartItemRepo, ILogger<OrdersController> logger, VNPayService vNPayService, IDistributedCache distributedCache, IConfiguration config, IMapper mapper, OrderRepo orderRepoSingle, RevenueRepo revenueRepo)
         {
             _orderRepo = orderRepo;
             _orderItemRepo = orderItemRepo;
@@ -35,6 +36,7 @@ namespace backend.Controllers
             _config = config;
             _mapper = mapper;
             _orderRepoSingle = orderRepoSingle;
+            _revenueRepo = revenueRepo;
         }
 
         // GET: api/Orders
@@ -148,6 +150,23 @@ namespace backend.Controllers
             // Xóa giỏ hàng sau khi tạo đơn hàng thành công
             await _cartItemRepo.ClearCartAsync(invoiceCreate.CustomerID);
 
+            // Cộng tiền Orders vào revenue
+            if (await _revenueRepo.CheckExistDate(invoiceCreate.DateTime))
+            {
+                var revenue = await _revenueRepo.GetByDate(invoiceCreate.DateTime);
+                revenue.Amount += createdInvoice.TotalPrice;
+                await _revenueRepo.UpdateAsync(revenue);
+            }
+            else
+            {
+                var revenue = new Revenue
+                {
+                    Date = DateOnly.FromDateTime(invoiceCreate.DateTime),
+                    Amount = createdInvoice.TotalPrice,
+                };
+                await _revenueRepo.AddAsync(revenue);
+            }
+
             return CreatedAtAction("GetOrder", new { id = createdInvoice.OrderID }, createdInvoice);
         }
 
@@ -234,6 +253,23 @@ namespace backend.Controllers
 
                 // Xóa giỏ hàng sau khi tạo đơn hàng thành công
                 await _cartItemRepo.ClearCartAsync(invoiceCreate.CustomerID);
+
+                // Thêm Total Price của order vào revenue
+                if (await _revenueRepo.CheckExistDate(invoiceCreate.DateTime))
+                {
+                    var revenue = await _revenueRepo.GetByDate(invoiceCreate.DateTime);
+                    revenue.Amount += createdInvoice.TotalPrice;
+                    await _revenueRepo.UpdateAsync(revenue);
+                }
+                else
+                {
+                    var revenue = new Revenue
+                    {
+                        Date = DateOnly.FromDateTime(invoiceCreate.DateTime),
+                        Amount = createdInvoice.TotalPrice,
+                    };
+                    await _revenueRepo.AddAsync(revenue);
+                }
 
                 var redirectUrl = $"{_config["VnPay:VnPayFrontendReturnUrl"]}?success={paymentResponse.Success}&orderId={paymentResponse.OrderId}&transactionId={paymentResponse.TransactionId}";
                 return Redirect(redirectUrl);
