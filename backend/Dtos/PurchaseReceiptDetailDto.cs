@@ -26,7 +26,7 @@ namespace backend.Dtos
     public class PurchaseReceiptDetailUpdateDto
     {
         public int PurchaseReceiptDetailID { get; set; }
-        public int PurchaseReceiptID { get; set; }
+        public Guid PurchaseReceiptID { get; set; }
         public int ProductSizeID { get; set; }
         public int? RealQuantity { get; set; }
     }

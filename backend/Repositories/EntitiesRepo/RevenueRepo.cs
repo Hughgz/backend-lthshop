@@ -16,5 +16,22 @@ namespace backend.Repositories.EntitiesRepo
                 .ToListAsync();
         }
 
+        public async Task<bool> CheckExistDate(DateTime date)
+        {
+            var checkDate = DateOnly.FromDateTime(date);
+            var revenue = await _context.Revenues
+                .AnyAsync(r => r.Date == checkDate); 
+
+            return revenue;
+        }
+
+        public async Task<Revenue> GetByDate(DateTime date)
+        {
+            var dateOnly = DateOnly.FromDateTime(date);
+            return await _context.Revenues.Where(r => r.Date == dateOnly).FirstOrDefaultAsync();
+
+        }
+
+
     }
 }
