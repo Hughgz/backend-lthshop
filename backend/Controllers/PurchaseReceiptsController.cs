@@ -14,13 +14,15 @@ namespace backend.Controllers
         private readonly PurchaseReceiptRepo _purchaseReceiptRepo;
         private readonly PurchaseReceiptDetailRepo _purchaseReceiptDetailRepo;
         private readonly ProductSizeRepo _productSizeRepo;
+        private readonly StockHistoryRepo _stockHistoryRepo;
         private readonly IMapper _mapper;
 
-        public PurchaseReceiptsController(PurchaseReceiptRepo purchaseReceiptRepo, PurchaseReceiptDetailRepo purchaseReceiptDetailRepo, ProductSizeRepo productSizeRepo, IMapper mapper)
+        public PurchaseReceiptsController(PurchaseReceiptRepo purchaseReceiptRepo, PurchaseReceiptDetailRepo purchaseReceiptDetailRepo, ProductSizeRepo productSizeRepo, StockHistoryRepo stockHistoryRepo, IMapper mapper)
         {
             _purchaseReceiptRepo = purchaseReceiptRepo;
             _purchaseReceiptDetailRepo = purchaseReceiptDetailRepo;
             _productSizeRepo = productSizeRepo;
+            _stockHistoryRepo = stockHistoryRepo;
             _mapper = mapper;
         }
 
@@ -139,6 +141,15 @@ namespace backend.Controllers
                 productSize.RealQuantity += detail.RealQuantity.Value;
 
                 await _productSizeRepo.UpdateAsync(productSize);
+
+                // Update stock history
+                await _stockHistoryRepo.AddAsync(new StockHistory
+                {
+                    UpdatedDateTime = DateTime.Now,
+                    ProductSizeID = detail.ProductSizeID,
+                    StockChange = detail.RealQuantity.Value,
+                    Note = $"<a href=\"https://lthshop-frontend.vercel.app/purchase-receipts/{detail.PurchaseReceiptID}\">Purchase Receipt: {detail.PurchaseReceiptID}</a>",
+                });
             }
 
             return NoContent();
