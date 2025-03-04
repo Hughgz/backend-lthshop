@@ -70,14 +70,11 @@ builder.Services.AddScoped<IRepo<CartItem>, CartItemRepo>();
 builder.Services.AddScoped<CartItemRepo>();
 builder.Services.AddScoped<OrderRepo>();
 builder.Services.AddScoped<OrderItemRepo>();
-<<<<<<< HEAD
-=======
 builder.Services.AddScoped<RevenueRepo>();
 builder.Services.AddScoped<PurchaseReceiptRepo>();
 builder.Services.AddScoped<PurchaseReceiptDetailRepo>();
 builder.Services.AddScoped<ProductSizeRepo>();
 
->>>>>>> 406794e16b7d5d937443ab6f99b1cc7e8df3d617
 // Register services
 builder.Services.AddScoped<VNPayService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
