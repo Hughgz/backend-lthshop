@@ -27,7 +27,7 @@ namespace backend.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetStockHistoryByProductSizeIdAndPeriod(int productSizeId, DateTime startDate, DateTime endDate)
+        public async Task<IActionResult> GetStockHistoryByProductSizeIdAndPeriod(int? productSizeId, DateTime? startDate, DateTime? endDate)
         {
             var stockHistories = await _stockHistoryRepo.GetManyByProductSizeIdAndPeriod(productSizeId, startDate, endDate);
             var stockHistoriesResult = _mapper.Map<IEnumerable<StockHistoryReadDto>>(stockHistories);
