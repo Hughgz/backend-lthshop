@@ -43,7 +43,8 @@ namespace backend.Entities
         // Navigation property
         public ICollection<Order> Orders { get; set; } = new List<Order>();
 
-        public List<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
+        public ICollection<WishlistedItem> WishlistedItems { get; set; } = new List<WishlistedItem>();
 
     }
 }
