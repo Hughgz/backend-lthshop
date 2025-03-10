@@ -10,7 +10,6 @@ namespace backend.Entities
         public int ProductSizeID { get; set; }
 
         public int Size { get; set; }
-        public double SalePrice { get; set; }
         public int StockQuantity { get; set; }
 
         public int RealQuantity { get; set; }
