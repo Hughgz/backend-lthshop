@@ -46,6 +46,14 @@ namespace backend.Controllers
             return Ok(productPricesReadDto);
         }
 
+        [HttpGet("all-product-price-pending-for-approval")]
+        public async Task<IActionResult> GetAllProductPricePendingForApproval()
+        {
+            var productPrices = await _repository.GetAllProductPricePendingForApproval();
+            var productPricesReadDto = _mapper.Map<IEnumerable<ProductPriceReadDto>>(productPrices);
+            return Ok(productPricesReadDto);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateProductPrice(ProductPriceCreateDto productPriceCreateDto)
         {

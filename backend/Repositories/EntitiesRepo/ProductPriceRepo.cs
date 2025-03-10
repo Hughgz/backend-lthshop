@@ -22,5 +22,12 @@ namespace backend.Repositories.EntitiesRepo
                 .Where(p => p.ProductSizeId == productSizeId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<ProductPrice>> GetAllProductPricePendingForApproval()
+        {
+            return await _context.ProductPrices
+                .Where(p => p.productPriceStatus == ProductPriceStatus.PendingForApproval)
+                .ToListAsync();
+        }
     }
 }
