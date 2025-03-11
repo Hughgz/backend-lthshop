@@ -322,7 +322,7 @@ namespace backend.Controllers
                     UpdatedDateTime = DateTime.Now,
                     ProductSizeID = item.ProductSize.ProductSizeID,
                     StockChange = -item.Quantity,
-                    Note = "https://lthshop-frontend.vercel.app/orders/"+ item.OrderID,
+                    Note = "http://localhost:5173/orders/" + item.OrderID,
                 });
             }
 
