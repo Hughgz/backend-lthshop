@@ -6,7 +6,8 @@
         public int Size { get; set; }
         public decimal Price { get; set; }
         public decimal CostPrice { get; set; }
-        public int Quantity { get; set; }
+        public int StockQuantity { get; set; } // Đổi từ Quantity thành StockQuantity
+        public int RealQuantity { get; set; } // Thêm RealQuantity
         public int ProductID { get; set; }
         public string ProductName { get; set; }
     }
@@ -16,8 +17,8 @@
         public int Size { get; set; }
         public decimal Price { get; set; }
         public decimal CostPrice { get; set; }
-
-        public int Quantity { get; set; }
+        public int StockQuantity { get; set; } // Đổi từ Quantity thành StockQuantity
+        public int RealQuantity { get; set; } // Thêm RealQuantity
         public int ProductID { get; set; }
     }
 
@@ -26,7 +27,8 @@
         public int Size { get; set; }
         public decimal Price { get; set; }
         public decimal CostPrice { get; set; }
-        public int Quantity { get; set; }
+        public int StockQuantity { get; set; } // Đổi từ Quantity thành StockQuantity
+        public int RealQuantity { get; set; } // Thêm RealQuantity
         public int ProductID { get; set; }
     }
 }
