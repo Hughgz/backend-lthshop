@@ -322,7 +322,7 @@ namespace backend.Controllers
                     UpdatedDateTime = DateTime.Now,
                     ProductSizeID = item.ProductSize.ProductSizeID,
                     StockChange = -item.Quantity,
-                    Note = "http://localhost:5173/orders/" + item.OrderID,
+                    Note = $"OrderID: <a href=\"http://localhost:5173/orders/{item.OrderID}\">{item.OrderID}</a>",
                 });
             }
 
