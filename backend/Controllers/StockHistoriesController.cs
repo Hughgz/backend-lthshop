@@ -29,6 +29,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<IActionResult> GetStockHistoryByProductSizeIdAndPeriod(int? productSizeId, DateTime? startDate, DateTime? endDate)
         {
+            endDate = endDate.Value.AddSeconds(86399);
             var stockHistories = await _stockHistoryRepo.GetManyByProductSizeIdAndPeriod(productSizeId, startDate, endDate);
             var stockHistoriesResult = _mapper.Map<IEnumerable<StockHistoryReadDto>>(stockHistories);
             return Ok(stockHistoriesResult);
