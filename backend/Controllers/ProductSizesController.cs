@@ -73,6 +73,9 @@ namespace backend.Controllers
         public async Task<ActionResult<ProductSize>> PostProductSize(ProductSizeCreateDto productSize)
         {
             var productSizeEntity = _mapper.Map<ProductSize>(productSize);
+            productSizeEntity.StockQuantity = 0;
+            productSizeEntity.RealQuantity = 0;
+
             var added = await _productSizeRepo.AddAsync(productSizeEntity);
             if (added == null)
             {
