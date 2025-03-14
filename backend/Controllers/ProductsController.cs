@@ -27,7 +27,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProducts()
         {
-            var products = await _productRepo.GetAllAsync();
+            var products = await _productRepo.GetByIdAsync(3);
             var productsDto = _mapper.Map<IEnumerable<ProductReadDto>>(products);
             return Ok(productsDto);
         }
@@ -93,7 +93,7 @@ namespace backend.Controllers
             }
             var alias = ProductAliasGenerator.GenerateAlias(productDto.Name);
             var product = _mapper.Map<Product>(productDto);
-            //product.NameAlias = alias;
+            product.NameAlias = alias;
             var added = await _productRepo.AddAsync(product);
             if (added == null)
             {
