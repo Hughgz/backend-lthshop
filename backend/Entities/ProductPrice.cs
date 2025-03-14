@@ -7,7 +7,8 @@ namespace backend.Entities
     {
         Active,
         Inactive,
-        PendingForApproval
+        PendingForApproval,
+        Rejected
     }
 
     public class ProductPrice

@@ -87,6 +87,18 @@ namespace backend.Controllers
             return Ok();
         }
 
+        [HttpPost("reject/{productPriceId}")]
+        public async Task<IActionResult> RejectProductPrice(int productPriceId)
+        {
+            var productPrice = await _repository.GetByIdAsync(productPriceId);
+            if (productPrice == null)
+            {
+                return NotFound();
+            }
 
+            productPrice.productPriceStatus = ProductPriceStatus.Rejected;
+            await _repository.UpdateAsync(productPrice);
+            return Ok();
+        }
     }
 }

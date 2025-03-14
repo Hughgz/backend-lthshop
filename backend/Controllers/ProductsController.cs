@@ -27,7 +27,7 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductReadDto>>> GetProducts()
         {
-            var products = await _productRepo.GetByIdAsync(3);
+            var products = await _productRepo.GetAllAsync();
             var productsDto = _mapper.Map<IEnumerable<ProductReadDto>>(products);
             return Ok(productsDto);
         }
