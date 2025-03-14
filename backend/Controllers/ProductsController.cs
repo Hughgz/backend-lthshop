@@ -93,7 +93,7 @@ namespace backend.Controllers
             }
             var alias = ProductAliasGenerator.GenerateAlias(productDto.Name);
             var product = _mapper.Map<Product>(productDto);
-            product.NameAlias = alias;
+            //product.NameAlias = alias;
             var added = await _productRepo.AddAsync(product);
             if (added == null)
             {
