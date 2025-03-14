@@ -29,5 +29,6 @@ namespace backend.Entities
 
         // Navigation property
         public ICollection<ProductSize> ProductSizes { get; set; } = new List<ProductSize>();
+        public ICollection<WishlistedItem> WishlistedItems { get; set; } = new List<WishlistedItem>();
     }
 }

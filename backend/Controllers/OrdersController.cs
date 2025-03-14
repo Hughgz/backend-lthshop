@@ -322,7 +322,7 @@ namespace backend.Controllers
                     UpdatedDateTime = DateTime.Now,
                     ProductSizeID = item.ProductSize.ProductSizeID,
                     StockChange = -item.Quantity,
-                    Note = $"<a href=\"https://lthshop-frontend.vercel.app/orders/{item.OrderID}\">OrderID: {item.OrderID}</a>",
+                    Note = $"OrderID: <a href=\"http://localhost:5173/orders/{item.OrderID}\">{item.OrderID}</a>",
                 });
             }
 
