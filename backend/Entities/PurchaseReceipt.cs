@@ -16,7 +16,7 @@ namespace backend.Entities
     public class PurchaseReceipt
     {
         [Key]
-        public int PurchaseReceiptID { get; set; }
+        public Guid PurchaseReceiptID { get; set; }
 
         public DateTime DateTime { get; set; }
 
@@ -24,7 +24,7 @@ namespace backend.Entities
         public decimal TotalPrice { get; set; }
 
         public PurchaseReceiptStatus Status { get; set; }
-        public string PaymentType { get; set; }
+        public string PaymentType { get; set; } 
 
         public string? TransactionID { get; set; }
 
@@ -33,6 +33,6 @@ namespace backend.Entities
         // Navigation property
         public Supplier Supplier { get; set; }
 
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+        public ICollection<PurchaseReceiptDetail> PurchaseReceiptDetails { get; set; } = new List<PurchaseReceiptDetail>();
     }
 }

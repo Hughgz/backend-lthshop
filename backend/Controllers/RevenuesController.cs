@@ -29,14 +29,15 @@ namespace backend.Controllers
             return Ok(revenueDtos);
         }
 
-        [HttpGet("period")] 
-        public async Task<IActionResult> GetRevenuesWithPeriod([FromQuery] DateOnly DateFrom, [FromQuery] DateOnly DateTo)
+        [HttpGet("period")]
+        public async Task<IActionResult> GetRevenuesWithPeriod(int yearFrom, int monthFrom, int dayFrom, int yearTo, int monthTo, int dayTo)
         {
-            if (DateFrom == default || DateTo == default)
-                return BadRequest("DateFrom and DateTo are required.");
+            var fromDate = new DateOnly(yearFrom, monthFrom, dayFrom);
+            var toDate = new DateOnly(yearTo, monthTo, dayTo);
 
-            var revenues = await _revenueRepo.GetRevenueWithPeriod(DateFrom, DateTo);
+            var revenues = await _revenueRepo.GetRevenueWithPeriod(fromDate, toDate);
             return Ok(_mapper.Map<IEnumerable<RevenueReadDto>>(revenues));
         }
+
     }
 }

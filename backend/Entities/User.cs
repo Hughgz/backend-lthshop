@@ -18,7 +18,6 @@ namespace backend.Entities
 
         [Required]
         public string HashPassword { get; set; }
-
         [Required]
         [MaxLength(20)]
         public string Role { get; set; }

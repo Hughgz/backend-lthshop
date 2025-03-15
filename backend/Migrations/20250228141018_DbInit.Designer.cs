@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Entities;
 
@@ -11,9 +12,11 @@ using backend.Entities;
 namespace backend.Migrations
 {
     [DbContext(typeof(EcommerceDBContext))]
-    partial class EcommerceDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250228141018_DbInit")]
+    partial class DbInit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -481,7 +484,7 @@ namespace backend.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductSizeID")
+                    b.Property<int>("ProductID")
                         .HasColumnType("int");
 
                     b.Property<int>("StockChange")
@@ -492,7 +495,7 @@ namespace backend.Migrations
 
                     b.HasKey("StockHistoryID");
 
-                    b.HasIndex("ProductSizeID");
+                    b.HasIndex("ProductID");
 
                     b.ToTable("StockHistories");
                 });
@@ -561,29 +564,6 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("backend.Entities.WishlistedItem", b =>
-                {
-                    b.Property<int>("WishlistedItemID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistedItemID"));
-
-                    b.Property<int>("CustomerID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.HasKey("WishlistedItemID");
-
-                    b.HasIndex("CustomerID");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.CartItem", b =>
@@ -677,7 +657,7 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Entities.ProductPrice", b =>
                 {
                     b.HasOne("backend.Entities.ProductSize", "ProductSize")
-                        .WithMany("ProductPrice")
+                        .WithMany("ProductPrices")
                         .HasForeignKey("ProductSizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -728,30 +708,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.StockHistory", b =>
                 {
-                    b.HasOne("backend.Entities.ProductSize", "ProductSize")
-                        .WithMany()
-                        .HasForeignKey("ProductSizeID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ProductSize");
-                });
-
-            modelBuilder.Entity("backend.Entities.WishlistedItem", b =>
-                {
-                    b.HasOne("backend.Entities.Customer", "Customer")
-                        .WithMany("WishlistedItems")
-                        .HasForeignKey("CustomerID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("backend.Entities.Product", "Product")
-                        .WithMany("WishlistedItems")
+                        .WithMany()
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });
@@ -766,8 +727,6 @@ namespace backend.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("Orders");
-
-                    b.Navigation("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.Order", b =>
@@ -778,15 +737,13 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Entities.Product", b =>
                 {
                     b.Navigation("ProductSizes");
-
-                    b.Navigation("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("ProductPrice");
+                    b.Navigation("ProductPrices");
                 });
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>

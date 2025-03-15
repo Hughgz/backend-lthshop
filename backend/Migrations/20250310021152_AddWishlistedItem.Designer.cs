@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Entities;
 
@@ -11,9 +12,11 @@ using backend.Entities;
 namespace backend.Migrations
 {
     [DbContext(typeof(EcommerceDBContext))]
-    partial class EcommerceDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250310021152_AddWishlistedItem")]
+    partial class AddWishlistedItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,7 +356,7 @@ namespace backend.Migrations
 
                     b.HasIndex("ProductSizeId");
 
-                    b.ToTable("ProductPrice");
+                    b.ToTable("ProductPrices");
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
@@ -677,7 +680,7 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Entities.ProductPrice", b =>
                 {
                     b.HasOne("backend.Entities.ProductSize", "ProductSize")
-                        .WithMany("ProductPrice")
+                        .WithMany("ProductPrices")
                         .HasForeignKey("ProductSizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -786,7 +789,7 @@ namespace backend.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("ProductPrice");
+                    b.Navigation("ProductPrices");
                 });
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>

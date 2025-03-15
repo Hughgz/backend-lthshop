@@ -191,7 +191,6 @@ namespace backend.Repositories.AuthRepo
                 Username = userRegisterSignUpVM.Username,
                 Email = userRegisterSignUpVM.Email,
                 HashPassword = _passwordHasherCustomer.HashPassword(null, userRegisterSignUpVM.Password),
-                PasswordHash = _passwordHasherCustomer.HashPassword(null, userRegisterSignUpVM.Password),
                 Role = userRegisterSignUpVM.Role,
             };
 

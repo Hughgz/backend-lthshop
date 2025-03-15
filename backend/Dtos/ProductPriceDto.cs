@@ -1,19 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+﻿using backend.Entities;
 
-namespace backend.Entities
+namespace backend.Dtos
 {
-    public enum ProductPriceStatus
+    public class ProductPriceReadDto
     {
-        Active,
-        Inactive,
-        PendingForApproval,
-        Rejected
-    }
-
-    public class ProductPrice
-    {
-        [Key]
         public int Id { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? StartDate { get; set; }
@@ -22,6 +12,14 @@ namespace backend.Entities
         public double SellingPrice { get; set; }
         public ProductPriceStatus productPriceStatus { get; set; }
         public string? Description { get; set; }
-        public ProductSize ProductSize { get; set; }
+    }
+
+    public class ProductPriceCreateDto
+    {
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public int ProductSizeId { get; set; }
+        public double SellingPrice { get; set; }
+        public string? Description { get; set; }
     }
 }

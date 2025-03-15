@@ -12,8 +12,8 @@ using backend.Entities;
 namespace backend.Migrations
 {
     [DbContext(typeof(EcommerceDBContext))]
-    [Migration("20250227030435_DBInit")]
-    partial class DBInit
+    [Migration("20250311105402_updatev1")]
+    partial class updatev1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -270,9 +270,6 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PurchaseReceiptID")
-                        .HasColumnType("int");
-
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
@@ -281,8 +278,6 @@ namespace backend.Migrations
                     b.HasIndex("OrderID");
 
                     b.HasIndex("ProductSizeID");
-
-                    b.HasIndex("PurchaseReceiptID");
 
                     b.ToTable("OrderItems");
                 });
@@ -348,8 +343,8 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SellingPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("SellingPrice")
+                        .HasColumnType("float");
 
                     b.Property<DateTime?>("StartDate")
                         .HasColumnType("datetime2");
@@ -361,7 +356,7 @@ namespace backend.Migrations
 
                     b.HasIndex("ProductSizeId");
 
-                    b.ToTable("ProductPrice");
+                    b.ToTable("ProductPrices");
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
@@ -393,11 +388,9 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
                 {
-                    b.Property<int>("PurchaseReceiptID")
+                    b.Property<Guid>("PurchaseReceiptID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseReceiptID"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
@@ -436,14 +429,14 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
-                    b.Property<int>("PurchaseReceiptID")
-                        .HasColumnType("int");
+                    b.Property<Guid>("PurchaseReceiptID")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("RawPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double>("RawPrice")
+                        .HasColumnType("float");
 
                     b.Property<int?>("RealQuantity")
                         .HasColumnType("int");
@@ -472,14 +465,8 @@ namespace backend.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("Day")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Month")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
@@ -497,7 +484,7 @@ namespace backend.Migrations
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductID")
+                    b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
                     b.Property<int>("StockChange")
@@ -508,7 +495,7 @@ namespace backend.Migrations
 
                     b.HasKey("StockHistoryID");
 
-                    b.HasIndex("ProductID");
+                    b.HasIndex("ProductSizeID");
 
                     b.ToTable("StockHistories");
                 });
@@ -577,6 +564,29 @@ namespace backend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("backend.Entities.WishlistedItem", b =>
+                {
+                    b.Property<int>("WishlistedItemID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("WishlistedItemID"));
+
+                    b.Property<int>("CustomerID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.HasKey("WishlistedItemID");
+
+                    b.HasIndex("CustomerID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.CartItem", b =>
@@ -651,10 +661,6 @@ namespace backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("backend.Entities.PurchaseReceipt", null)
-                        .WithMany("OrderItems")
-                        .HasForeignKey("PurchaseReceiptID");
-
                     b.Navigation("Order");
 
                     b.Navigation("ProductSize");
@@ -713,7 +719,7 @@ namespace backend.Migrations
                         .IsRequired();
 
                     b.HasOne("backend.Entities.PurchaseReceipt", "PurchaseReceipt")
-                        .WithMany()
+                        .WithMany("PurchaseReceiptDetails")
                         .HasForeignKey("PurchaseReceiptID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -725,11 +731,30 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.StockHistory", b =>
                 {
-                    b.HasOne("backend.Entities.Product", "Product")
+                    b.HasOne("backend.Entities.ProductSize", "ProductSize")
                         .WithMany()
+                        .HasForeignKey("ProductSizeID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductSize");
+                });
+
+            modelBuilder.Entity("backend.Entities.WishlistedItem", b =>
+                {
+                    b.HasOne("backend.Entities.Customer", "Customer")
+                        .WithMany("WishlistedItems")
+                        .HasForeignKey("CustomerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("backend.Entities.Product", "Product")
+                        .WithMany("WishlistedItems")
                         .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Customer");
 
                     b.Navigation("Product");
                 });
@@ -744,6 +769,8 @@ namespace backend.Migrations
                     b.Navigation("CartItems");
 
                     b.Navigation("Orders");
+
+                    b.Navigation("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.Order", b =>
@@ -754,6 +781,8 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Entities.Product", b =>
                 {
                     b.Navigation("ProductSizes");
+
+                    b.Navigation("WishlistedItems");
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
@@ -765,7 +794,7 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
                 {
-                    b.Navigation("OrderItems");
+                    b.Navigation("PurchaseReceiptDetails");
                 });
 
             modelBuilder.Entity("backend.Entities.User", b =>

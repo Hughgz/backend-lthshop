@@ -7,6 +7,7 @@ using backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
+using static System.Net.WebRequestMethods;
 
 namespace backend.Controllers
 {
@@ -15,7 +16,7 @@ namespace backend.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IRepo<Order> _orderRepo;
-        private readonly IRepo<OrderItem> _orderItemRepo;
+        private readonly OrderItemRepo _orderItemRepo;
         private readonly CartItemRepo _cartItemRepo;
         private readonly ILogger<OrdersController> _logger;
         private readonly VNPayService _vnPayService;
@@ -23,8 +24,11 @@ namespace backend.Controllers
         private readonly IConfiguration _config;
         private readonly IMapper _mapper;
         private readonly OrderRepo _orderRepoSingle;
+        private readonly RevenueRepo _revenueRepo;
+        private readonly StockHistoryRepo _stockHistoryRepo;
+        private readonly ProductSizeRepo _productSizeRepo;
 
-        public OrdersController(IRepo<Order> orderRepo, IRepo<OrderItem> orderItemRepo, CartItemRepo cartItemRepo, ILogger<OrdersController> logger, VNPayService vNPayService, IDistributedCache distributedCache, IConfiguration config, IMapper mapper, OrderRepo orderRepoSingle)
+        public OrdersController(IRepo<Order> orderRepo, OrderItemRepo orderItemRepo, CartItemRepo cartItemRepo, ILogger<OrdersController> logger, VNPayService vNPayService, IDistributedCache distributedCache, IConfiguration config, IMapper mapper, OrderRepo orderRepoSingle, RevenueRepo revenueRepo, StockHistoryRepo stockHistoryRepo, ProductSizeRepo productSizeRepo)
         {
             _orderRepo = orderRepo;
             _orderItemRepo = orderItemRepo;
@@ -35,6 +39,9 @@ namespace backend.Controllers
             _config = config;
             _mapper = mapper;
             _orderRepoSingle = orderRepoSingle;
+            _revenueRepo = revenueRepo;
+            _stockHistoryRepo = stockHistoryRepo;
+            _productSizeRepo = productSizeRepo;
         }
 
         // GET: api/Orders
@@ -148,6 +155,23 @@ namespace backend.Controllers
             // Xóa giỏ hàng sau khi tạo đơn hàng thành công
             await _cartItemRepo.ClearCartAsync(invoiceCreate.CustomerID);
 
+            // Cộng tiền Orders vào revenue
+            if (await _revenueRepo.CheckExistDate(invoiceCreate.DateTime))
+            {
+                var revenue = await _revenueRepo.GetByDate(invoiceCreate.DateTime);
+                revenue.Amount += createdInvoice.TotalPrice;
+                await _revenueRepo.UpdateAsync(revenue);
+            }
+            else
+            {
+                var revenue = new Revenue
+                {
+                    Date = DateOnly.FromDateTime(invoiceCreate.DateTime),
+                    Amount = createdInvoice.TotalPrice,
+                };
+                await _revenueRepo.AddAsync(revenue);
+            }
+
             return CreatedAtAction("GetOrder", new { id = createdInvoice.OrderID }, createdInvoice);
         }
 
@@ -235,6 +259,23 @@ namespace backend.Controllers
                 // Xóa giỏ hàng sau khi tạo đơn hàng thành công
                 await _cartItemRepo.ClearCartAsync(invoiceCreate.CustomerID);
 
+                // Thêm Total Price của order vào revenue
+                if (await _revenueRepo.CheckExistDate(invoiceCreate.DateTime))
+                {
+                    var revenue = await _revenueRepo.GetByDate(invoiceCreate.DateTime);
+                    revenue.Amount += createdInvoice.TotalPrice;
+                    await _revenueRepo.UpdateAsync(revenue);
+                }
+                else
+                {
+                    var revenue = new Revenue
+                    {
+                        Date = DateOnly.FromDateTime(invoiceCreate.DateTime),
+                        Amount = createdInvoice.TotalPrice,
+                    };
+                    await _revenueRepo.AddAsync(revenue);
+                }
+
                 var redirectUrl = $"{_config["VnPay:VnPayFrontendReturnUrl"]}?success={paymentResponse.Success}&orderId={paymentResponse.OrderId}&transactionId={paymentResponse.TransactionId}";
                 return Redirect(redirectUrl);
             }
@@ -255,6 +296,37 @@ namespace backend.Controllers
         {
             var invoiceJson = JsonSerializer.Serialize(invoice);
             await _distributedCache.SetStringAsync("Invoice", invoiceJson);
+        }
+
+        [HttpPost("confirm-deliver/{orderId}")]
+        public async Task<IActionResult> ConfirmDelivery(int orderId)
+        {
+            var order = await _orderRepo.GetByIdAsync(orderId);
+            if (order == null)
+            {
+                return NotFound();
+            }
+            order.Status = OrderStatus.Delivered;
+            await _orderRepo.UpdateAsync(order);
+
+            // Change stock when delivering
+            var orderItems = await _orderItemRepo.GetOrderItemsByOrderId(orderId);
+            foreach (var item in orderItems) {
+                var productSize = await _productSizeRepo.GetByIdAsync(item.ProductSizeID);
+                productSize.StockQuantity -= item.Quantity;
+                await _productSizeRepo.UpdateAsync(productSize);
+
+                // Update stock history
+                await _stockHistoryRepo.AddAsync(new StockHistory
+                {
+                    UpdatedDateTime = DateTime.Now,
+                    ProductSizeID = item.ProductSize.ProductSizeID,
+                    StockChange = -item.Quantity,
+                    Note = $"OrderID: <a href=\"http://localhost:5173/orders/{item.OrderID}\">{item.OrderID}</a>",
+                });
+            }
+
+            return Ok("Confirm sucessfully!");
         }
     }
 }
