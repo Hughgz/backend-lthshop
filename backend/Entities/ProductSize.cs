@@ -18,7 +18,7 @@ namespace backend.Entities
 
         // Navigation property
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
-        public ICollection<ProductPrice> ProductPrices { get; set; } = new List<ProductPrice>();
+        public ICollection<ProductPrice> ProductPrice { get; set; } = new List<ProductPrice>();
         public Product Product { get; set; }
     }
 }
