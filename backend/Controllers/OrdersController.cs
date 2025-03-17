@@ -149,6 +149,11 @@ namespace backend.Controllers
             foreach (var orderItem in orderItems)
             {
                 await _orderItemRepo.AddAsync(orderItem);
+
+                // Trừ system quantity khi tạo order
+                var productSize = await _productSizeRepo.GetByIdAsync(orderItem.ProductSizeID);
+                productSize.RealQuantity -= orderItem.Quantity;
+                await _productSizeRepo.UpdateAsync(productSize);
             }
             _logger.LogInformation("Order items added successfully!");
 
@@ -253,6 +258,10 @@ namespace backend.Controllers
                 foreach (var orderItem in orderItems)
                 {
                     await _orderItemRepo.AddAsync(orderItem);
+                    // Trừ system quantity khi tạo order
+                    var productSize = await _productSizeRepo.GetByIdAsync(orderItem.ProductSizeID);
+                    productSize.RealQuantity -= orderItem.Quantity;
+                    await _productSizeRepo.UpdateAsync(productSize);
                 }
                 _logger.LogInformation("Order items added successfully!");
 
