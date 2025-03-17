@@ -4,9 +4,9 @@ using backend.Entities;
 
 namespace backend.Profiles
 {
-    public class PurchaseRecepitDetailMapping : Profile
+    public class PurchaseReceiptDetailMapping: Profile
     {
-        public PurchaseRecepitDetailMapping()
+        public PurchaseReceiptDetailMapping()
         {
             CreateMap<PurchaseReceiptDetail, PurchaseReceiptDetailReadDto>();
             CreateMap<PurchaseReceiptDetailCreateDto, PurchaseReceiptDetail>();

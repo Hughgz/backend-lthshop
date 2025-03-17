@@ -28,7 +28,7 @@ namespace backend.Entities
         public DbSet<GoodsInspectionItem> GoodsInspectionItems { get; set; }
         public DbSet<GoodsInspection> GoodsInspections { get; set; }
         public DbSet<StockHistory> StockHistories { get; set; }
-        public DbSet<ProductPrice> ProductPrices { get; set; }
+        public DbSet<ProductPrice> ProductPrice { get; set; }
         public DbSet<WishlistedItem> WishlistedItems { get; set; }
 
 

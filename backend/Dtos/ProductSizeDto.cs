@@ -4,7 +4,6 @@
     {
         public int ProductSizeID { get; set; }
         public int Size { get; set; }
-
         public int StockQuantity { get; set; }
         public int RealQuantity { get; set; }
         public int ProductID { get; set; }

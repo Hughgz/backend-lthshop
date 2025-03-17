@@ -78,12 +78,15 @@ namespace backend.Controllers
             {
                 return NotFound();
             }
-
             var activeProductPrice = await _repository.GetActiveProductPriceByProductSizeId(productPrice.ProductSizeId);
-            activeProductPrice.productPriceStatus = ProductPriceStatus.Inactive;
+            if (activeProductPrice != null)
+            {
+                activeProductPrice.productPriceStatus = ProductPriceStatus.Inactive;
+                await _repository.UpdateAsync(activeProductPrice);
+            }
             productPrice.productPriceStatus = ProductPriceStatus.Active;
             await _repository.UpdateAsync(productPrice);
-            await _repository.UpdateAsync(activeProductPrice);
+
             return Ok();
         }
 

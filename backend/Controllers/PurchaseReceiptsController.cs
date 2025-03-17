@@ -33,7 +33,7 @@ namespace backend.Controllers
             var purchaseReceiptsResult = _mapper.Map<IEnumerable<PurchaseReceiptReadDto>>(purchaseReceipts);
             foreach (var purchaseReceipt in purchaseReceiptsResult)
             {
-                var purchaseReceiptDetails = _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(purchaseReceipt.PurchaseReceiptID);
+                var purchaseReceiptDetails =  await _purchaseReceiptDetailRepo.GetManyByPurchaseReceiptId(purchaseReceipt.PurchaseReceiptID);
                 var purchaseReceiptDetailsDto = _mapper.Map<IEnumerable<PurchaseReceiptDetailReadDto>>(purchaseReceiptDetails);
                 purchaseReceipt.Details = purchaseReceiptDetailsDto;
             }
@@ -115,7 +115,7 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        [HttpPost("comfirm/{id}")]
+        [HttpPost("confirm/{id}")]
         public async Task<IActionResult> ConfirmPurchaseReceipt(Guid id, IEnumerable<PurchaseReceiptDetailUpdateDto> purchaseReceiptDetailUpdateDtos)
         {
             var purchaseReceipt = await _purchaseReceiptRepo.GetPurchaseReceiptById(id);
