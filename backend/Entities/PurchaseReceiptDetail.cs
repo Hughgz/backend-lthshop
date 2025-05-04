@@ -8,7 +8,7 @@ namespace backend.Entities
         [Key]
         public int PurchaseReceiptDetailID { get; set; }
 
-        public Guid PurchaseReceiptID { get; set; }
+        public int PurchaseReceiptID { get; set; }
 
         public int ProductSizeID { get; set; }
 

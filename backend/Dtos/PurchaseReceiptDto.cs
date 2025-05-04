@@ -22,7 +22,7 @@ namespace backend.Dtos
 
     public class PurchaseReceiptReadDto
     {
-        public Guid PurchaseReceiptID { get; set; }
+        public int PurchaseReceiptID { get; set; }
 
         public DateTime DateTime { get; set; }
 

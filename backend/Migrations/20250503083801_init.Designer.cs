@@ -12,8 +12,8 @@ using backend.Entities;
 namespace backend.Migrations
 {
     [DbContext(typeof(EcommerceDBContext))]
-    [Migration("20250311105402_updatev1")]
-    partial class updatev1
+    [Migration("20250503083801_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -356,7 +356,7 @@ namespace backend.Migrations
 
                     b.HasIndex("ProductSizeId");
 
-                    b.ToTable("ProductPrices");
+                    b.ToTable("ProductPrice");
                 });
 
             modelBuilder.Entity("backend.Entities.ProductSize", b =>
@@ -388,9 +388,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
                 {
-                    b.Property<Guid>("PurchaseReceiptID")
+                    b.Property<int>("PurchaseReceiptID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseReceiptID"));
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
@@ -429,8 +431,8 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("PurchaseReceiptID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PurchaseReceiptID")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
@@ -680,7 +682,7 @@ namespace backend.Migrations
             modelBuilder.Entity("backend.Entities.ProductPrice", b =>
                 {
                     b.HasOne("backend.Entities.ProductSize", "ProductSize")
-                        .WithMany("ProductPrices")
+                        .WithMany("ProductPrice")
                         .HasForeignKey("ProductSizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -789,7 +791,7 @@ namespace backend.Migrations
                 {
                     b.Navigation("OrderItems");
 
-                    b.Navigation("ProductPrices");
+                    b.Navigation("ProductPrice");
                 });
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>

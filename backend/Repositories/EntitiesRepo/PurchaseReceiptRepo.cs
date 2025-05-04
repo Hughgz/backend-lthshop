@@ -6,7 +6,7 @@ namespace backend.Repositories.EntitiesRepo
     {
         public PurchaseReceiptRepo(EcommerceDBContext context) : base(context) { }
 
-        public async Task<PurchaseReceipt> GetPurchaseReceiptById(Guid id)
+        public async Task<PurchaseReceipt> GetPurchaseReceiptById(int id)
         {
             return await Task.FromResult(_context.Set<PurchaseReceipt>().Find(id));
         }

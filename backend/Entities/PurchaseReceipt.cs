@@ -16,7 +16,7 @@ namespace backend.Entities
     public class PurchaseReceipt
     {
         [Key]
-        public Guid PurchaseReceiptID { get; set; }
+        public int PurchaseReceiptID { get; set; }
 
         public DateTime DateTime { get; set; }
 

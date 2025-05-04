@@ -385,9 +385,11 @@ namespace backend.Migrations
 
             modelBuilder.Entity("backend.Entities.PurchaseReceipt", b =>
                 {
-                    b.Property<Guid>("PurchaseReceiptID")
+                    b.Property<int>("PurchaseReceiptID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PurchaseReceiptID"));
 
                     b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2");
@@ -426,8 +428,8 @@ namespace backend.Migrations
                     b.Property<int>("ProductSizeID")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("PurchaseReceiptID")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("PurchaseReceiptID")
+                        .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");

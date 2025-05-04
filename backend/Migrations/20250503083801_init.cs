@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace backend.Migrations
 {
     /// <inheritdoc />
-    public partial class DbInit : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -161,7 +161,8 @@ namespace backend.Migrations
                 name: "PurchaseReceipt",
                 columns: table => new
                 {
-                    PurchaseReceiptID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
@@ -232,21 +233,25 @@ namespace backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StockHistories",
+                name: "WishlistedItems",
                 columns: table => new
                 {
-                    StockHistoryID = table.Column<int>(type: "int", nullable: false)
+                    WishlistedItemID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ProductID = table.Column<int>(type: "int", nullable: false),
-                    StockChange = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    CustomerID = table.Column<int>(type: "int", nullable: false),
+                    ProductID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StockHistories", x => x.StockHistoryID);
+                    table.PrimaryKey("PK_WishlistedItems", x => x.WishlistedItemID);
                     table.ForeignKey(
-                        name: "FK_StockHistories_Products_ProductID",
+                        name: "FK_WishlistedItems_Customers_CustomerID",
+                        column: x => x.CustomerID,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerID",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_WishlistedItems_Products_ProductID",
                         column: x => x.ProductID,
                         principalTable: "Products",
                         principalColumn: "ProductID",
@@ -363,7 +368,7 @@ namespace backend.Migrations
                 {
                     PurchaseReceiptDetailID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PurchaseReceiptID = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PurchaseReceiptID = table.Column<int>(type: "int", nullable: false),
                     ProductSizeID = table.Column<int>(type: "int", nullable: false),
                     Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
@@ -384,6 +389,28 @@ namespace backend.Migrations
                         column: x => x.PurchaseReceiptID,
                         principalTable: "PurchaseReceipt",
                         principalColumn: "PurchaseReceiptID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockHistories",
+                columns: table => new
+                {
+                    StockHistoryID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UpdatedDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ProductSizeID = table.Column<int>(type: "int", nullable: false),
+                    StockChange = table.Column<int>(type: "int", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockHistories", x => x.StockHistoryID);
+                    table.ForeignKey(
+                        name: "FK_StockHistories_ProductSizes_ProductSizeID",
+                        column: x => x.ProductSizeID,
+                        principalTable: "ProductSizes",
+                        principalColumn: "ProductSizeID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -458,8 +485,18 @@ namespace backend.Migrations
                 column: "PurchaseReceiptID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StockHistories_ProductID",
+                name: "IX_StockHistories_ProductSizeID",
                 table: "StockHistories",
+                column: "ProductSizeID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishlistedItems_CustomerID",
+                table: "WishlistedItems",
+                column: "CustomerID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WishlistedItems_ProductID",
+                table: "WishlistedItems",
                 column: "ProductID");
         }
 
@@ -494,25 +531,28 @@ namespace backend.Migrations
                 name: "StockHistories");
 
             migrationBuilder.DropTable(
+                name: "WishlistedItems");
+
+            migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "ProductSizes");
+                name: "PurchaseReceipt");
 
             migrationBuilder.DropTable(
-                name: "PurchaseReceipt");
+                name: "ProductSizes");
 
             migrationBuilder.DropTable(
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Suppliers");
 
             migrationBuilder.DropTable(
-                name: "Suppliers");
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Categories");
